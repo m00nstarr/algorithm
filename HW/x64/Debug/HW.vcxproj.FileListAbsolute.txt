@@ -1,0 +1,2 @@
+C:\Users\user\Desktop\2020_2학기\알고리즘\HW\x64\Debug\HW.exe
+C:\Users\user\Desktop\2020_2학기\알고리즘\HW\x64\Debug\HW.pdb
