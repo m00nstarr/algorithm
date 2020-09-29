@@ -6,7 +6,7 @@
 #include <string>
 
 #define _CRT_SECURE_NO_WARNINGS
-#define Is_2D false
+#define Is_2D true
 #define N_Sequence 10
 #define Final_n Is_2D?N_Sequence*N_Sequence:N_Sequence
 #define Max_Sequence_Elements N_Sequence*10
@@ -16,7 +16,8 @@ void main(void) {
 	int target;
 	float prob;
 	char c_string[256];
-	sprintf(c_string,"HW01_%s_%d.in.bin", Is_2D?"2D":"1D", N_Sequence);
+	
+	sprintf(c_string, "HW01_%s_%d.in.bin", Is_2D ? "2D" : "1D", N_Sequence);
 	std::ofstream File(std::string(c_string).data(), std::ios::out | std::ios::binary);
 
 	srand((unsigned)time(NULL));
