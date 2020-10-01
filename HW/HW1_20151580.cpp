@@ -34,12 +34,21 @@ typedef struct elem {
 	int value;
 }ELEM;
 
+typedef struct elem_2d {
+	int start_c;
+	int finish_c;
+	int start_r;
+	int finish_r;
+	int value;
+}ELEM_2D;
+
 int MSS[3] = { 0, };
+int MSS_2D[5] = { 0, };
 
 ELEM maxsubsum(int *, int, int);
 void solve_1(int, int*);
-void solve_2(int, int*);
-void solve_3(int, int*);
+int solve_2(int, int*);
+ELEM_2D solve_3(int, int*);
 void solve_4(int, int*);
 void solve_5(int, int*);
 
@@ -54,6 +63,7 @@ int main() {
 	int main_loop_index, i; // for loop index var.
 	int testcase;			// number of testcase
 	
+	int temp;
 	int alg_num; // solution number
 	int N;		 // input Size
 	int* arr;	 // sequence
@@ -90,7 +100,7 @@ int main() {
 			
 			case 2:
 
-				solve_2(N, arr);
+				temp = solve_2(N, arr);
 				for (i = 0; i < N; i++) printf("%d ", arr[i]);
 				printf("MSS is %d %d %d\n", MSS[2], MSS[0], MSS[1]);
 				fp_output = fopen(output, "wb");
@@ -98,9 +108,11 @@ int main() {
 				break;
 	
 			case 3:
-				printf("%d\n", N);
+				ELEM_2D result;
 
-				solve_3(int(sqrt(N)), arr);
+				result = solve_3(int(sqrt(N)), arr);
+
+				printf("MSS is %d index: %d %d %d %d\n", result.value, result.start_r, result.start_c, result.finish_r, result.finish_c);
 				fp_output = fopen(output, "wb");
 				fclose(fp_output);
 				break;
@@ -114,8 +126,10 @@ int main() {
 			
 			case 5:
 
-				solve_5(N, arr);
+				solve_5(sqrt(N), arr);
 				fp_output = fopen(output, "wb");
+				printf("MSS is %d\n", MSS[2]);
+
 				fclose(fp_output);
 				break;
 			default:
@@ -197,14 +211,17 @@ ELEM maxsubsum(int* arr, int left, int right) {
 }
 
 
-void solve_2(int N, int* arr) {
+int solve_2(int N, int* arr) {
 
 	int local_MSS;
 	int thissum;
 	int i;
 	int local_start = 0;
 	
+	MSS[2] = INT_MIN;
 	MSS[1] = -1;
+	MSS[0] = -1; // initializing
+
 	local_MSS = INT_MIN;
 	thissum = 0;
 
@@ -233,14 +250,14 @@ void solve_2(int N, int* arr) {
 	}
 	else {
 		MSS[2] = local_MSS;
-		return;
+		return local_MSS;
 	}
 
 	MSS[2] = local_MSS;
-	return;
+	return local_MSS;
 } //solved by kadane algorithm , O(N)
 
-void solve_3(int N, int* arr) {
+ELEM_2D solve_3(int N, int* arr) {
 	int **sumtable = new int*[N];
 
 	for (int i = 0; i < N; i++) {
@@ -270,21 +287,51 @@ void solve_3(int N, int* arr) {
 	}
 	int thissum = 0;
 	int maxsum = INT_MIN;
-	for (int i = 0; i < N; i++) {
-		for (int j = 0; j < N; j++) {
-			for (int k = i; k < N; k++) {
-				for (int q = j; q < N; q++) {
-					thissum = sumtable[k][q] - sumtable[j - 1][i] - sumtable[k][i - 1] + sumtable[i - 1][j - 1];
+	
+	ELEM_2D result;
+	result.start_c = 0, result.finish_c = 0, result.start_r = 0, result.finish_r = 0;
+
+	for (int i = 0; i < N; i++) { // start of row
+		for (int j = 0; j < N; j++) { // start of col
+
+			for (int q = i; q < N; q++) { //finish of row
+				for (int k = j; k < N; k++) { // finish of col
+
+					if (i == 0 || j == 0) {
+
+						if (i == 0 && j == 0) {
+							thissum = sumtable[q][k];
+						}
+						else if (i == 0) {
+							thissum = sumtable[q][k] - sumtable[q][j];
+						}
+						else if (j == 0) {
+							thissum = sumtable[q][k] - sumtable[i][k];
+						}
+					}
+					else {
+						thissum = sumtable[q][k] - sumtable[q][j] - sumtable[i][k] + sumtable[i][j];
+					}
+
+					if (thissum > maxsum) {
+						maxsum = thissum;
+						result.finish_c = k;
+						result.finish_r = q;
+						result.start_c = j;
+						result.start_r = i;
+					}
 				}
 			}
 		}
 	}
 
+	result.value = maxsum;
+
 	for (int i = 0; i < N; i++) {
 		delete[] sumtable[i];
 	}
 	delete[] sumtable;
-	return;
+	return result;
 }
 
 void solve_4(int N, int* arr) {
@@ -294,5 +341,30 @@ void solve_4(int N, int* arr) {
 
 void solve_5(int N, int* arr) {
 
+	int maxsum = INT_MIN;
+	ELEM_2D result;
+	
+	int thissum = 0;
+	int* temp = new int[N];
+
+
+	for (int left = 0; left < N; left++) {
+
+		for (int i = 0; i < N; i++) temp[i] = 0;
+
+		for (int right = left; right < N; right++) {
+			
+			for (int i = 0; i < N; i++) {
+				temp[i] += arr[i*N+ right];
+			}
+
+			int result = solve_2(N, temp);
+			
+			if (result > maxsum) maxsum = result;
+		}
+	}
+	printf("maxsum : %d\n ", maxsum);
+
+	delete[] temp;
 	return;
 }
