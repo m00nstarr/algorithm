@@ -24,6 +24,9 @@
     <ClCompile Include="HW1_20151580.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="timing.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
     <ClCompile Include="testvalue.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>

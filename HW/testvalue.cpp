@@ -134,7 +134,7 @@ int main()
     int testcase;			// number of testcase
 
     int alg_num; // solution number
-    fp_input = fopen("HW01_1_2D_10.in.bin", "rb");
+    fp_input = fopen("HW01_1_2D_1000.in.bin", "rb");
     fread(&N, sizeof(int), 1, fp_input);
 
 
@@ -145,19 +145,19 @@ int main()
     }
 
 
-    for (int i = 0; i < sqrt(N); i++) {
-        for (int j = 0; j < sqrt(N); j++) {
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j <N; j++) {
             fread(&arr[i][j], sizeof(int), 1, fp_input);
-            printf("%d ", arr[i][j]);
+           
 
         }
-        printf("\n");
+     
     } // read binary file // read binary file
 
     fclose(fp_input);
 
 
-    findMaxSum(arr, sqrt(N));
+    findMaxSum(arr, N);
 
     return 0;
 }

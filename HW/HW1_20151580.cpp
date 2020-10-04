@@ -5,6 +5,10 @@
 #include <iostream>
 #include <cstring>
 #include <cmath>
+#include <windows.h>
+
+#define CHECK_TIME_START QueryPerformanceFrequency ((_LARGE_INTEGER*)&freq); QueryPerformanceCounter((_LARGE_INTEGER*)&start)
+#define CHECK_TIME_END(a) QueryPerformanceCounter((_LARGE_INTEGER*)&end); a=(float)((float) (end - start)/freq)
 
 using namespace std;
 
@@ -42,36 +46,34 @@ typedef struct elem_2d {
 	int value;
 }ELEM_2D;
 
-int MSS[3] = { 0, };
-int MSS_2D[5] = { 0, };
-
 ELEM maxsubsum(int *, int, int);
-void solve_1(int, int*);
-int solve_2(int, int*);
+ELEM solve_1(int, int*);
+ELEM solve_2(int, int*);
 ELEM_2D solve_3(int, int*);
-void solve_4(int, int*);
-void solve_5(int, int*);
+ELEM_2D solve_4(int, int*);
+ELEM_2D solve_5(int, int*);
 
-
+float resulttime;
 
 int main() {
 
 	FILE* fp;		// HW1_config.txt file pointer
 	FILE* fp_input; // input binary file
 	FILE* fp_output;// ouptut binary file
+	FILE* result_file;
 
-	int main_loop_index, i; // for loop index var.
+	int main_loop_index, i,j; // for loop index var.
 	int testcase;			// number of testcase
-	
-	int temp;
+
 	int alg_num; // solution number
 	int N;		 // input Size
 	int* arr;	 // sequence
+	__int64 start, freq, end;
 
 	char input[33], output[33]; // filename of input file, output file 
 	
 	fp = fopen("HW1_config.txt", "r");
-
+	result_file = fopen("result.txt", "w");
 	testcase = 0;
 	fscanf(fp,"%d\n", &testcase);
 
@@ -81,56 +83,143 @@ int main() {
 
 		fp_input = fopen(input, "rb");
 		fread(&N, sizeof(int), 1, fp_input);
-		arr = (int*)calloc(N, sizeof(int));
+	
 
-		for (i = 0; i < N; i++) {
-			fread(&arr[i], sizeof(int), 1, fp_input);
-		} // read binary file // read binary file
+		if (alg_num > 2) {
+			int arrsize = N * N;
+
+			arr = (int*)calloc( arrsize , sizeof(int));
+			for (i = 0; i <arrsize; i++) {
+				fread(&arr[i], sizeof(int), 1, fp_input);
+			}
+
+		}
+		else if (alg_num > 0 && alg_num < 3) {
+			arr = (int*)calloc(N, sizeof(int));
+			for (i = 0; i < N; i++) {
+				fread(&arr[i], sizeof(int), 1, fp_input);
+			}
+		}
+		else {
+			continue;
+		}
 
 		fclose(fp_input);
 
+		ELEM result_1D;
+		ELEM_2D result_2D;
 		switch (alg_num) {
 			case 1:
-				solve_1(N, arr);
-				for (i = 0; i < N; i++) printf("%d ", arr[i]);
+				
+				CHECK_TIME_START;
+				result_1D = solve_1(N, arr);
+				CHECK_TIME_END(resulttime);
+				
+				printf("MSS is %d %d %d\n", result_1D.value, result_1D.start, result_1D.finish);
+				printf("N :: %d / time :: %f\n\n", N, resulttime);
+
+				fprintf(result_file,"MSS is %d %d %d\n", result_1D.value, result_1D.start, result_1D.finish);
+				fprintf(result_file, "N :: %d / time :: %f\n\n", N, resulttime);
+
 				fp_output = fopen(output, "wb");
-				printf("MSS is %d %d %d\n", MSS[2], MSS[0], MSS[1]);
+				fwrite(&result_1D.value, sizeof(int), 1, fp_output);
+				fwrite(&result_1D.start, sizeof(int), 1, fp_output);
+				fwrite(&result_1D.finish, sizeof(int), 1, fp_output);
+
 				fclose(fp_output);
+
 				break;
 			
 			case 2:
+				CHECK_TIME_START;
+				result_1D = solve_2(N, arr);
+				CHECK_TIME_END(resulttime);
 
-				temp = solve_2(N, arr);
-				for (i = 0; i < N; i++) printf("%d ", arr[i]);
-				printf("MSS is %d %d %d\n", MSS[2], MSS[0], MSS[1]);
+				printf("MSS is %d %d %d\n", result_1D.value, result_1D.start, result_1D.finish);
+				printf("N :: %d / time :: %f\n\n", N, resulttime);
+
+				fprintf(result_file, "MSS is %d %d %d\n", result_1D.value, result_1D.start, result_1D.finish);
+				fprintf(result_file, "N :: %d / time :: %f\n\n", N, resulttime);
+
 				fp_output = fopen(output, "wb");
+				fwrite(&result_1D.value, sizeof(int), 1, fp_output);
+				fwrite(&result_1D.start, sizeof(int), 1, fp_output);
+				fwrite(&result_1D.finish, sizeof(int), 1, fp_output);
+				
 				fclose(fp_output);
+				
 				break;
 	
 			case 3:
-				ELEM_2D result;
+				
+				CHECK_TIME_START;
+				result_2D = solve_3(N, arr);
+				CHECK_TIME_END(resulttime);
 
-				result = solve_3(int(sqrt(N)), arr);
+				printf("MSS is %d index: %d %d %d %d\n", result_2D.value, result_2D.start_r, result_2D.start_c, result_2D.finish_r, result_2D.finish_c);
+				printf("N :: %d / time :: %f\n\n", N, resulttime);
 
-				printf("MSS is %d index: %d %d %d %d\n", result.value, result.start_r, result.start_c, result.finish_r, result.finish_c);
+				fprintf(result_file,"MSS is %d index: %d %d %d %d\n", result_2D.value, result_2D.start_r, result_2D.start_c, result_2D.finish_r, result_2D.finish_c);
+				fprintf(result_file,"N :: %d / time :: %f\n\n", N, resulttime);
+
 				fp_output = fopen(output, "wb");
+
+				fwrite(&result_2D.value, sizeof(int), 1, fp_output);
+				fwrite(&result_2D.start_r,sizeof(int), 1, fp_output);
+				fwrite(&result_2D.start_c, sizeof(int), 1, fp_output);
+				fwrite(&result_2D.finish_r, sizeof(int), 1, fp_output);
+				fwrite(&result_2D.finish_c, sizeof(int), 1, fp_output);
+
 				fclose(fp_output);
+		
 				break;
 
 			case 4:
+	
+				CHECK_TIME_START;
+				result_2D = solve_4(N, arr);
+				CHECK_TIME_END(resulttime);
+				
+				printf("MSS is %d index: %d %d %d %d\n", result_2D.value, result_2D.start_r, result_2D.start_c, result_2D.finish_r, result_2D.finish_c);
+				printf("N :: %d / time :: %f\n\n", N, resulttime);
+				
+				fprintf(result_file, "MSS is %d index: %d %d %d %d\n", result_2D.value, result_2D.start_r, result_2D.start_c, result_2D.finish_r, result_2D.finish_c);
+				fprintf(result_file, "N :: %d / time :: %f\n\n", N, resulttime);
 
-				solve_4(N, arr);
 				fp_output = fopen(output, "wb");
+
+				fwrite(&result_2D.value, sizeof(int), 1, fp_output);
+				fwrite(&result_2D.start_r, sizeof(int), 1, fp_output);
+				fwrite(&result_2D.start_c, sizeof(int), 1, fp_output);
+				fwrite(&result_2D.finish_r, sizeof(int), 1, fp_output);
+				fwrite(&result_2D.finish_c, sizeof(int), 1, fp_output);
+
 				fclose(fp_output);
+				
 				break;
 			
 			case 5:
+	
+				CHECK_TIME_START;
+				result_2D = solve_5(N, arr);
+				CHECK_TIME_END(resulttime);
+				
+				printf("MSS is %d index: %d %d %d %d\n", result_2D.value, result_2D.start_r, result_2D.start_c, result_2D.finish_r, result_2D.finish_c);
+				printf("N :: %d / time :: %f\n\n", N, resulttime);
 
-				solve_5(sqrt(N), arr);
+				fprintf(result_file, "MSS is %d index: %d %d %d %d\n", result_2D.value, result_2D.start_r, result_2D.start_c, result_2D.finish_r, result_2D.finish_c);
+				fprintf(result_file, "N :: %d / time :: %f\n\n", N, resulttime);
+
 				fp_output = fopen(output, "wb");
-				printf("MSS is %d\n", MSS[2]);
 
+				fwrite(&result_2D.value, sizeof(int), 1, fp_output);
+				fwrite(&result_2D.start_r, sizeof(int), 1, fp_output);
+				fwrite(&result_2D.start_c, sizeof(int), 1, fp_output);
+				fwrite(&result_2D.finish_r, sizeof(int), 1, fp_output);
+				fwrite(&result_2D.finish_c, sizeof(int), 1, fp_output);
+				
 				fclose(fp_output);
+				
 				break;
 			default:
 				printf("err/ No solution number : %2d\n", alg_num);
@@ -139,20 +228,16 @@ int main() {
 		free(arr);
 	}
 	fclose(fp);
+	fclose(result_file);
 }
 
-void solve_1(int N, int *arr) {
+ELEM solve_1(int N, int *arr) {
 	
 	ELEM result;
 	result = maxsubsum(arr, 0, N - 1);
 	
-	MSS[0] = result.start;
-	MSS[1] = result.finish;
-	MSS[2] = result.value;
-	
-	return;
+	return result;
 }
-
 ELEM maxsubsum(int* arr, int left, int right) {
 
 	int center, i;
@@ -209,18 +294,17 @@ ELEM maxsubsum(int* arr, int left, int right) {
 
 
 }
-
-
-int solve_2(int N, int* arr) {
+ELEM solve_2(int N, int* arr) {
 
 	int local_MSS;
 	int thissum;
 	int i;
 	int local_start = 0;
-	
-	MSS[2] = INT_MIN;
-	MSS[1] = -1;
-	MSS[0] = -1; // initializing
+	ELEM result;
+
+	result.value = INT_MIN;
+	result.finish = -1;
+	result.start = -1; // initializing
 
 	local_MSS = INT_MIN;
 	thissum = 0;
@@ -228,44 +312,44 @@ int solve_2(int N, int* arr) {
 	for (i = 0; i < N; i++) {
 		thissum += arr[i];
 
+		if (thissum < 0) {
+			thissum = 0;
+			local_start = i + 1;
+			continue;
+		}
+
 		if (thissum > local_MSS) {
 			local_MSS = thissum;
-			MSS[0] = local_start; MSS[1] = i;
+			result.start = local_start; 
+			result.finish = i;
 		}
-		else if (thissum < 0) {
-			thissum = 0; 
-			local_start = i+1;
-		}
+	
 	}
 
-	if (MSS[1] == -1) { // for nonempty sequence
+	if (result.finish == -1) { // for nonempty sequence
 		local_MSS = arr[0];
-		MSS[0] = MSS[1] = 0;
+		result.start = result.finish = 0;
 		for (i = 0; i < N; i++) {
 			if (arr[i] > local_MSS) { // find largest negative number among arr
 				local_MSS = arr[i];
-				MSS[0] = MSS[1] = i;
+				result.start = result.finish = i;
 			}
 		}
 	}
 	else {
-		MSS[2] = local_MSS;
-		return local_MSS;
+		result.value = local_MSS;
+		
+		//printf("MSS : %d , start : %d, finish %d\n", result.value, result.start, result.finish);
+		
+		return result;
 	}
-
-	MSS[2] = local_MSS;
-	return local_MSS;
+	result.value = local_MSS;
+	return result;
 } //solved by kadane algorithm , O(N)
-
 ELEM_2D solve_3(int N, int* arr) {
 	int **sumtable = new int*[N];
 
-	for (int i = 0; i < N; i++) {
-		for (int j = 0; j < N; j++) {
-			cout << arr[i * N + j] << " ";
-		}
-		cout << endl;
-	}
+	
 	for (int i = 0; i < N; i++) {
 		sumtable[i] = new int[N];
 	}
@@ -303,14 +387,14 @@ ELEM_2D solve_3(int N, int* arr) {
 							thissum = sumtable[q][k];
 						}
 						else if (i == 0) {
-							thissum = sumtable[q][k] - sumtable[q][j];
+							thissum = sumtable[q][k] - sumtable[q][j-1];
 						}
 						else if (j == 0) {
-							thissum = sumtable[q][k] - sumtable[i][k];
+							thissum = sumtable[q][k] - sumtable[i-1][k];
 						}
 					}
 					else {
-						thissum = sumtable[q][k] - sumtable[q][j] - sumtable[i][k] + sumtable[i][j];
+						thissum = sumtable[q][k] - sumtable[q][j-1] - sumtable[i-1][k] + sumtable[i-1][j-1];
 					}
 
 					if (thissum > maxsum) {
@@ -333,38 +417,82 @@ ELEM_2D solve_3(int N, int* arr) {
 	delete[] sumtable;
 	return result;
 }
-
-void solve_4(int N, int* arr) {
-
-	return;
-}
-
-void solve_5(int N, int* arr) {
-
-	int maxsum = INT_MIN;
-	ELEM_2D result;
+ELEM_2D solve_4(int N, int* arr) {
 	
+	int maxsum = INT_MIN;
+
 	int thissum = 0;
 	int* temp = new int[N];
 
+	int left, right;
 
-	for (int left = 0; left < N; left++) {
+
+	ELEM result;
+	ELEM_2D rresult;
+	for (left = 0; left < N; left++) {
 
 		for (int i = 0; i < N; i++) temp[i] = 0;
 
-		for (int right = left; right < N; right++) {
-			
-			for (int i = 0; i < N; i++) {
-				temp[i] += arr[i*N+ right];
+		for (right = left; right < N; right++) {
+
+			for (int k = 0; k < N; k++) {
+				temp[k] += arr[k * N + right];
 			}
 
-			int result = solve_2(N, temp);
-			
-			if (result > maxsum) maxsum = result;
+			result = solve_1(N, temp);
+
+
+			if (result.value > maxsum) {
+				maxsum = result.value;
+				rresult.start_c = left;
+				rresult.finish_c = right;
+				rresult.start_r = result.start;
+				rresult.finish_r = result.finish;
+			}
 		}
 	}
-	printf("maxsum : %d\n ", maxsum);
+	rresult.value = maxsum;
 
 	delete[] temp;
-	return;
+	return rresult;
+	
+}
+ELEM_2D solve_5(int N, int* arr) {
+
+	int maxsum = INT_MIN;
+	
+	int thissum = 0;
+	int* temp = new int[N];
+	
+	int left, right;
+	
+
+	ELEM result;
+	ELEM_2D rresult;
+	for ( left = 0; left < N; left++) {
+
+		for (int i = 0; i < N; i++) temp[i] = 0;
+
+		for (right = left; right < N; right++) {
+
+			for (int k = 0; k < N; k++) {
+				temp[k] += arr[k * N + right];
+			}
+
+			result = solve_2(N, temp);
+
+			if (result.value > maxsum) {
+				maxsum = result.value;
+				rresult.start_c = left;
+				rresult.finish_c = right;
+				rresult.start_r = result.start;
+				rresult.finish_r = result.finish;
+			}
+		}
+	}
+
+	rresult.value = maxsum;
+
+	delete[] temp;
+	return rresult;
 }

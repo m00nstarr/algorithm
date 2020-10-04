@@ -1,1 +1,5 @@
-﻿  HW.vcxproj -> C:\Users\user\Desktop\2020_2학기\알고리즘\HW\x64\Debug\HW.exe
+﻿  HW1_20151580.cpp
+C:\Users\user\Desktop\2020_2학기\알고리즘\HW\HW1_20151580.cpp(166,29): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\user\Desktop\2020_2학기\알고리즘\HW\HW1_20151580.cpp(183,29): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\Users\user\Desktop\2020_2학기\알고리즘\HW\HW1_20151580.cpp(65,6): warning C4101: 'temp' :참조되지 않은 지역 변수입니다.
+  HW.vcxproj -> C:\Users\user\Desktop\2020_2학기\알고리즘\HW\x64\Debug\HW.exe
