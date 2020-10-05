@@ -60,9 +60,8 @@ int main() {
 	FILE* fp;		// HW1_config.txt file pointer
 	FILE* fp_input; // input binary file
 	FILE* fp_output;// ouptut binary file
-	FILE* result_file;
 
-	int main_loop_index, i,j; // for loop index var.
+	int main_loop_index, i; // for loop index var.
 	int testcase;			// number of testcase
 
 	int alg_num; // solution number
@@ -72,10 +71,13 @@ int main() {
 
 	char input[33], output[33]; // filename of input file, output file 
 	
+
+		
+
 	fp = fopen("HW1_config.txt", "r");
-	result_file = fopen("result.txt", "w");
+
 	testcase = 0;
-	fscanf(fp,"%d\n", &testcase);
+	fscanf(fp, "%d\n", &testcase);
 
 	for (main_loop_index = 0; main_loop_index < testcase; main_loop_index++) {
 
@@ -83,13 +85,12 @@ int main() {
 
 		fp_input = fopen(input, "rb");
 		fread(&N, sizeof(int), 1, fp_input);
-	
 
 		if (alg_num > 2) {
+			
 			int arrsize = N * N;
-
-			arr = (int*)calloc( arrsize , sizeof(int));
-			for (i = 0; i <arrsize; i++) {
+			arr = (int*)calloc(arrsize, sizeof(int));
+			for (i = 0; i < arrsize; i++) {
 				fread(&arr[i], sizeof(int), 1, fp_input);
 			}
 
@@ -109,126 +110,110 @@ int main() {
 		ELEM result_1D;
 		ELEM_2D result_2D;
 		switch (alg_num) {
-			case 1:
-				
-				CHECK_TIME_START;
-				result_1D = solve_1(N, arr);
-				CHECK_TIME_END(resulttime);
-				
-				printf("MSS is %d %d %d\n", result_1D.value, result_1D.start, result_1D.finish);
-				printf("N :: %d / time :: %f\n\n", N, resulttime);
+		case 1:
 
-				fprintf(result_file,"MSS is %d %d %d\n", result_1D.value, result_1D.start, result_1D.finish);
-				fprintf(result_file, "N :: %d / time :: %f\n\n", N, resulttime);
+			CHECK_TIME_START;
+			result_1D = solve_1(N, arr);
+			CHECK_TIME_END(resulttime);
 
-				fp_output = fopen(output, "wb");
-				fwrite(&result_1D.value, sizeof(int), 1, fp_output);
-				fwrite(&result_1D.start, sizeof(int), 1, fp_output);
-				fwrite(&result_1D.finish, sizeof(int), 1, fp_output);
+			printf("solved by %d / MSS is %d index %d to %d\n", alg_num, result_1D.value, result_1D.start, result_1D.finish);
+			printf("N :: %d / time :: %f\n\n", N, resulttime);
 
-				fclose(fp_output);
+			fp_output = fopen(output, "wb");
+			fwrite(&result_1D.value, sizeof(int), 1, fp_output);
+			fwrite(&result_1D.start, sizeof(int), 1, fp_output);
+			fwrite(&result_1D.finish, sizeof(int), 1, fp_output);
 
-				break;
-			
-			case 2:
-				CHECK_TIME_START;
-				result_1D = solve_2(N, arr);
-				CHECK_TIME_END(resulttime);
+			fclose(fp_output);
 
-				printf("MSS is %d %d %d\n", result_1D.value, result_1D.start, result_1D.finish);
-				printf("N :: %d / time :: %f\n\n", N, resulttime);
+			break;
 
-				fprintf(result_file, "MSS is %d %d %d\n", result_1D.value, result_1D.start, result_1D.finish);
-				fprintf(result_file, "N :: %d / time :: %f\n\n", N, resulttime);
+		case 2:
+			CHECK_TIME_START;
+			result_1D = solve_2(N, arr);
+			CHECK_TIME_END(resulttime);
 
-				fp_output = fopen(output, "wb");
-				fwrite(&result_1D.value, sizeof(int), 1, fp_output);
-				fwrite(&result_1D.start, sizeof(int), 1, fp_output);
-				fwrite(&result_1D.finish, sizeof(int), 1, fp_output);
-				
-				fclose(fp_output);
-				
-				break;
-	
-			case 3:
-				
-				CHECK_TIME_START;
-				result_2D = solve_3(N, arr);
-				CHECK_TIME_END(resulttime);
+			printf("solved by %d / MSS is %d index %d to %d\n", alg_num, result_1D.value, result_1D.start, result_1D.finish);
+			printf("N :: %d / time :: %f\n\n", N, resulttime);
 
-				printf("MSS is %d index: %d %d %d %d\n", result_2D.value, result_2D.start_r, result_2D.start_c, result_2D.finish_r, result_2D.finish_c);
-				printf("N :: %d / time :: %f\n\n", N, resulttime);
+			fp_output = fopen(output, "wb");
+			fwrite(&result_1D.value, sizeof(int), 1, fp_output);
+			fwrite(&result_1D.start, sizeof(int), 1, fp_output);
+			fwrite(&result_1D.finish, sizeof(int), 1, fp_output);
 
-				fprintf(result_file,"MSS is %d index: %d %d %d %d\n", result_2D.value, result_2D.start_r, result_2D.start_c, result_2D.finish_r, result_2D.finish_c);
-				fprintf(result_file,"N :: %d / time :: %f\n\n", N, resulttime);
+			fclose(fp_output);
 
-				fp_output = fopen(output, "wb");
+			break;
 
-				fwrite(&result_2D.value, sizeof(int), 1, fp_output);
-				fwrite(&result_2D.start_r,sizeof(int), 1, fp_output);
-				fwrite(&result_2D.start_c, sizeof(int), 1, fp_output);
-				fwrite(&result_2D.finish_r, sizeof(int), 1, fp_output);
-				fwrite(&result_2D.finish_c, sizeof(int), 1, fp_output);
+		case 3:
 
-				fclose(fp_output);
-		
-				break;
+			CHECK_TIME_START;
+			result_2D = solve_3(N, arr);
+			CHECK_TIME_END(resulttime);
 
-			case 4:
-	
-				CHECK_TIME_START;
-				result_2D = solve_4(N, arr);
-				CHECK_TIME_END(resulttime);
-				
-				printf("MSS is %d index: %d %d %d %d\n", result_2D.value, result_2D.start_r, result_2D.start_c, result_2D.finish_r, result_2D.finish_c);
-				printf("N :: %d / time :: %f\n\n", N, resulttime);
-				
-				fprintf(result_file, "MSS is %d index: %d %d %d %d\n", result_2D.value, result_2D.start_r, result_2D.start_c, result_2D.finish_r, result_2D.finish_c);
-				fprintf(result_file, "N :: %d / time :: %f\n\n", N, resulttime);
+			printf("solved by %d / MSS is %d index: %d %d %d %d\n", alg_num,result_2D.value, result_2D.start_r, result_2D.start_c, result_2D.finish_r, result_2D.finish_c);
+			printf("N :: %d / time :: %f\n\n", N, resulttime);
 
-				fp_output = fopen(output, "wb");
+			fp_output = fopen(output, "wb");
 
-				fwrite(&result_2D.value, sizeof(int), 1, fp_output);
-				fwrite(&result_2D.start_r, sizeof(int), 1, fp_output);
-				fwrite(&result_2D.start_c, sizeof(int), 1, fp_output);
-				fwrite(&result_2D.finish_r, sizeof(int), 1, fp_output);
-				fwrite(&result_2D.finish_c, sizeof(int), 1, fp_output);
+			fwrite(&result_2D.value, sizeof(int), 1, fp_output);
+			fwrite(&result_2D.start_r, sizeof(int), 1, fp_output);
+			fwrite(&result_2D.start_c, sizeof(int), 1, fp_output);
+			fwrite(&result_2D.finish_r, sizeof(int), 1, fp_output);
+			fwrite(&result_2D.finish_c, sizeof(int), 1, fp_output);
 
-				fclose(fp_output);
-				
-				break;
-			
-			case 5:
-	
-				CHECK_TIME_START;
-				result_2D = solve_5(N, arr);
-				CHECK_TIME_END(resulttime);
-				
-				printf("MSS is %d index: %d %d %d %d\n", result_2D.value, result_2D.start_r, result_2D.start_c, result_2D.finish_r, result_2D.finish_c);
-				printf("N :: %d / time :: %f\n\n", N, resulttime);
+			fclose(fp_output);
 
-				fprintf(result_file, "MSS is %d index: %d %d %d %d\n", result_2D.value, result_2D.start_r, result_2D.start_c, result_2D.finish_r, result_2D.finish_c);
-				fprintf(result_file, "N :: %d / time :: %f\n\n", N, resulttime);
+			break;
 
-				fp_output = fopen(output, "wb");
+		case 4:
 
-				fwrite(&result_2D.value, sizeof(int), 1, fp_output);
-				fwrite(&result_2D.start_r, sizeof(int), 1, fp_output);
-				fwrite(&result_2D.start_c, sizeof(int), 1, fp_output);
-				fwrite(&result_2D.finish_r, sizeof(int), 1, fp_output);
-				fwrite(&result_2D.finish_c, sizeof(int), 1, fp_output);
-				
-				fclose(fp_output);
-				
-				break;
-			default:
-				printf("err/ No solution number : %2d\n", alg_num);
+			CHECK_TIME_START;
+			result_2D = solve_4(N, arr);
+			CHECK_TIME_END(resulttime);
+
+			printf("solved by %d MSS is %d index: %d %d %d %d\n", alg_num, result_2D.value, result_2D.start_r, result_2D.start_c, result_2D.finish_r, result_2D.finish_c);
+			printf("N :: %d / time :: %f\n\n", N, resulttime);
+
+			fp_output = fopen(output, "wb");
+
+			fwrite(&result_2D.value, sizeof(int), 1, fp_output);
+			fwrite(&result_2D.start_r, sizeof(int), 1, fp_output);
+			fwrite(&result_2D.start_c, sizeof(int), 1, fp_output);
+			fwrite(&result_2D.finish_r, sizeof(int), 1, fp_output);
+			fwrite(&result_2D.finish_c, sizeof(int), 1, fp_output);
+
+			fclose(fp_output);
+
+			break;
+
+		case 5:
+
+			CHECK_TIME_START;
+			result_2D = solve_5(N, arr);
+			CHECK_TIME_END(resulttime);
+
+			printf("solved by %d / MSS is %d index: %d %d %d %d\n", alg_num,result_2D.value, result_2D.start_r, result_2D.start_c, result_2D.finish_r, result_2D.finish_c);
+			printf("N :: %d / time :: %f\n\n", N, resulttime);
+
+			fp_output = fopen(output, "wb");
+
+			fwrite(&result_2D.value, sizeof(int), 1, fp_output);
+			fwrite(&result_2D.start_r, sizeof(int), 1, fp_output);
+			fwrite(&result_2D.start_c, sizeof(int), 1, fp_output);
+			fwrite(&result_2D.finish_r, sizeof(int), 1, fp_output);
+			fwrite(&result_2D.finish_c, sizeof(int), 1, fp_output);
+
+			fclose(fp_output);
+
+			break;
+		default:
+			printf("err/ No solution number : %2d\n", alg_num);
 		}
 
 		free(arr);
 	}
 	fclose(fp);
-	fclose(result_file);
 }
 
 ELEM solve_1(int N, int *arr) {
